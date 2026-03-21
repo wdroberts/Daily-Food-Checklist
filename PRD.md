@@ -84,8 +84,8 @@ The app must display the following checklist items each day, grouped by category
 
 ### 3.3 Check-off Behavior
 
-- Each item has a checkbox that toggles between unchecked and checked states.
-- Checked state persists for a rolling 24-hour window from when the checklist was last reset, then clears automatically.
+- Each item has a checkbox that toggles between checked and unchecked — always reversible.
+- Checked state persists for the current calendar day and resets at midnight local time.
 - Checked items may be visually distinguished (e.g., strikethrough, muted color) but remain visible so overall progress is clear.
 
 ### 3.4 Daily Progress Indicator
@@ -95,14 +95,16 @@ The app must display the following checklist items each day, grouped by category
 
 ### 3.5 Streak Tracking
 
-- Track consecutive 24-hour periods in which the user checks off all applicable items.
-- Display current streak and longest streak.
-- A period is considered complete when all applicable items are checked within the 24-hour window.
+- Track consecutive calendar days on which all applicable items are checked before midnight.
+- Display current streak and longest streak. Longest streak is never reduced.
+- A missed day shows as a gap on the calendar strip; the current streak resets to zero but longest streak is preserved.
+- The week starts on Monday.
 
 ### 3.6 Weekly Overview
 
-- Display a 7-day calendar strip showing which days were fully completed.
+- Display a 7-day calendar strip (Mon–Sun) showing complete, incomplete, and missed days distinctly.
 - Show weekly sardine completion (e.g., "1 / 2 sardine days hit this week").
+- Week resets on Monday.
 
 ### 3.7 Reminders / Notifications (Optional, Phase 2)
 
@@ -163,6 +165,7 @@ The app must display the following checklist items each day, grouped by category
 - Integration with wearables or third-party health apps.
 - Social / sharing features.
 - Recipe suggestions.
+- Cloud sync or account system.
 
 ---
 
@@ -172,11 +175,16 @@ Personal use — formal retention metrics are not applicable. The primary indica
 
 ---
 
-## 9. Open Questions
+## 9. Decisions Log
 
-1. Should unchecked items at the end of a 24-hour window trigger a notification or silently roll over?
-2. Should the 24-hour window start at a fixed time each day (e.g., 6 AM) or be anchored to first use each day?
-3. Should sardines be swappable for another protein on non-sardine days, or is the list fixed?
+| Decision | Choice | Rationale |
+|---|---|---|
+| Daily reset | Calendar day midnight | Simplest; aligns with sardine day-of-week logic |
+| Accidental tap | Always reversible toggle | A checkbox that can't be unticked is a trap |
+| Missed day behavior | Gap on calendar strip; current streak resets, longest streak preserved | Resetting longest streak is punitive and kills motivation |
+| Week start | Monday | Aligns with standard fitness convention and Mon/Thu sardine example |
+| Data export | Included in v1.0 | One button, JSON export; trivial to build, protects years of history |
+| Sardine list | Fixed; not swappable | Personal protocol is fixed; scope creep otherwise |
 
 ---
 
@@ -189,4 +197,5 @@ Personal use — formal retention metrics are not applicable. The primary indica
 | M3 | Progress indicator and streak tracking |
 | M4 | Weekly calendar overview |
 | M5 | PWA manifest, service worker, and Add to Home Screen support |
-| M6 | Optional notification system |
+| M6 | JSON data export |
+| M7 | Optional notification system |
