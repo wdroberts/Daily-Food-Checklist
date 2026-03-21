@@ -10,11 +10,11 @@
 
 ### 1.1 Product Summary
 
-The Daily Nutrient & Food Checklist is a lightweight habit-tracking application that helps users consistently consume a curated set of health-supporting foods and supplements each day. The product is grounded in a specific, research-backed food protocol and provides a simple, frictionless daily check-off experience.
+The Daily Nutrient & Food Checklist is a lightweight personal habit-tracking application for a single user to consistently consume a curated set of health-supporting foods and supplements each day. The product is grounded in a specific, research-backed food protocol and provides a simple, frictionless daily check-off experience.
 
 ### 1.2 Problem Statement
 
-Users who follow structured nutritional protocols struggle to remember and consistently track multiple daily food targets. Existing generic habit trackers do not support item-specific quantity guidance, frequency rules (e.g., "2x per week"), or categorized food groups in a way that maps naturally to a nutrition-focused workflow.
+Following a structured nutritional protocol means remembering and consistently tracking multiple daily food targets. Generic habit trackers do not support item-specific quantity guidance, frequency rules (e.g., "2x per week"), or categorized food groups in a way that maps naturally to a nutrition-focused workflow.
 
 ### 1.3 Goals
 
@@ -22,17 +22,13 @@ Users who follow structured nutritional protocols struggle to remember and consi
 - Support items with conditional frequency (e.g., sardines 2x/week on user-chosen days).
 - Enable users to check off items as they consume them throughout the day.
 - Track daily and weekly completion streaks to reinforce habit formation.
-- Be accessible across devices with minimal friction at point of use.
+- Be accessible on a single personal device with minimal friction at point of use.
 
 ---
 
-## 2. Target Users
+## 2. Target User
 
-| Persona | Description |
-|---|---|
-| Health-focused individual | Follows a specific nutritional protocol and wants a dedicated tracker aligned to it |
-| Habit builder | Motivated by streaks and daily completion metrics |
-| Busy adult | Needs a fast, glanceable checklist requiring no manual data entry beyond tapping |
+Single personal user following the defined nutritional protocol. No multi-user, account, or sharing features required.
 
 ---
 
@@ -89,8 +85,8 @@ The app must display the following checklist items each day, grouped by category
 ### 3.3 Check-off Behavior
 
 - Each item has a checkbox that toggles between unchecked and checked states.
-- Checked state persists for the current calendar day and resets at midnight (user's local time).
-- Checked items may be visually distinguished (e.g., strikethrough, muted color) but remain visible so users can see overall progress.
+- Checked state persists for a rolling 24-hour window from when the checklist was last reset, then clears automatically.
+- Checked items may be visually distinguished (e.g., strikethrough, muted color) but remain visible so overall progress is clear.
 
 ### 3.4 Daily Progress Indicator
 
@@ -99,9 +95,9 @@ The app must display the following checklist items each day, grouped by category
 
 ### 3.5 Streak Tracking
 
-- Track consecutive days on which the user checks off all applicable items.
+- Track consecutive 24-hour periods in which the user checks off all applicable items.
 - Display current streak and longest streak.
-- A day is considered complete when all applicable items are checked before midnight.
+- A period is considered complete when all applicable items are checked within the 24-hour window.
 
 ### 3.6 Weekly Overview
 
@@ -119,12 +115,11 @@ The app must display the following checklist items each day, grouped by category
 
 | Requirement | Detail |
 |---|---|
-| Platform | Web (PWA), iOS, Android |
-| Performance | Checklist must load and be interactive within 1 second on a standard connection |
-| Offline support | All check-off interactions must work offline; sync when reconnected |
-| Data persistence | User data stored locally (IndexedDB / SQLite) with optional cloud sync (account required for sync) |
-| Accessibility | WCAG 2.1 AA compliance; tap targets ≥ 44×44px |
-| Privacy | No health data sent to third parties; cloud sync end-to-end encrypted if implemented |
+| Platform | Single personal device (web app or native mobile) |
+| Performance | Checklist must load and be interactive within 1 second |
+| Data persistence | All data stored locally on-device (IndexedDB / SQLite); no cloud sync or account required |
+| Accessibility | Tap targets ≥ 44×44px; readable font sizes |
+| Privacy | No data leaves the device |
 
 ---
 
@@ -173,21 +168,15 @@ The app must display the following checklist items each day, grouped by category
 
 ## 8. Success Metrics
 
-| Metric | Target |
-|---|---|
-| Day-1 retention | ≥ 60% of users return the following day |
-| Day-7 retention | ≥ 35% |
-| Average daily checklist completion rate | ≥ 70% of applicable items checked per active user per day |
-| Streak ≥ 7 days reached | ≥ 25% of active users within 30 days |
+Personal use — formal retention metrics are not applicable. The primary indicator of success is daily personal use and consistent protocol adherence, reflected by streak history visible in the app.
 
 ---
 
 ## 9. Open Questions
 
-1. Should unchecked items at end-of-day trigger a notification or silent rollover?
-2. Is cloud sync a hard requirement for v1.0 or can local-only ship first?
-3. Should users be able to swap sardines for another protein on non-sardine days, or is the list fixed?
-4. What is the monetization model (free, freemium, one-time purchase)?
+1. Should unchecked items at the end of a 24-hour window trigger a notification or silently roll over?
+2. Should the 24-hour window start at a fixed time each day (e.g., 6 AM) or be anchored to first use each day?
+3. Should sardines be swappable for another protein on non-sardine days, or is the list fixed?
 
 ---
 
@@ -199,5 +188,5 @@ The app must display the following checklist items each day, grouped by category
 | M2 | Sardine day configuration and conditional item display |
 | M3 | Progress indicator and streak tracking |
 | M4 | Weekly calendar overview |
-| M5 | PWA packaging and offline support |
+| M5 | PWA or native packaging with local-only data storage |
 | M6 | Optional notification system |
