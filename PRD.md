@@ -115,9 +115,9 @@ The app must display the following checklist items each day, grouped by category
 
 | Requirement | Detail |
 |---|---|
-| Platform | Single personal device (web app or native mobile) |
+| Platform | Android PWA (Add to Home Screen); no App Store, no cost |
 | Performance | Checklist must load and be interactive within 1 second |
-| Data persistence | All data stored locally on-device (IndexedDB / SQLite); no cloud sync or account required |
+| Data persistence | IndexedDB for local storage; no cloud sync or account required |
 | Accessibility | Tap targets ≥ 44×44px; readable font sizes |
 | Privacy | No data leaves the device |
 
@@ -188,5 +188,5 @@ Personal use — formal retention metrics are not applicable. The primary indica
 | M2 | Sardine day configuration and conditional item display |
 | M3 | Progress indicator and streak tracking |
 | M4 | Weekly calendar overview |
-| M5 | PWA or native packaging with local-only data storage |
+| M5 | PWA manifest, service worker, and Add to Home Screen support |
 | M6 | Optional notification system |
