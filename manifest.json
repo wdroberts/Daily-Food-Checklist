@@ -1,0 +1,18 @@
+{
+  "name": "Daily Checklist",
+  "short_name": "Checklist",
+  "description": "Daily nutrient and food checklist",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4faf6",
+  "theme_color": "#2d6a4f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
