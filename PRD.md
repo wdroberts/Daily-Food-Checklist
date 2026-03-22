@@ -119,7 +119,7 @@ The app must display the following checklist items each day, grouped by category
 |---|---|
 | Platform | Android PWA (Add to Home Screen); no App Store, no cost |
 | Performance | Checklist must load and be interactive within 1 second |
-| Data persistence | IndexedDB for local storage; no cloud sync or account required |
+| Data persistence | localStorage (Web Storage API); no cloud sync or account required |
 | Accessibility | Tap targets ≥ 44×44px; readable font sizes |
 | Privacy | No data leaves the device |
 

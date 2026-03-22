@@ -33,12 +33,18 @@ let history  = {};   // { 'YYYY-MM-DD': { itemId: bool, … } }
 function loadSettings() {
   try { return JSON.parse(localStorage.getItem('settings')); } catch { return null; }
 }
-function saveSettings(s) { localStorage.setItem('settings', JSON.stringify(s)); }
+function saveSettings(s) { try { localStorage.setItem('settings', JSON.stringify(s)); } catch (e) { console.warn('Settings save failed:', e); } }
 
 function loadHistory() {
   try { return JSON.parse(localStorage.getItem('history')) ?? {}; } catch { return {}; }
 }
-function saveHistory(h) { localStorage.setItem('history', JSON.stringify(h)); }
+
+function pruneHistory(h) {
+  const cutoff = offsetDate(todayStr(), -90);
+  Object.keys(h).forEach(d => { if (d < cutoff) delete h[d]; });
+  return h;
+}
+function saveHistory(h) { try { localStorage.setItem('history', JSON.stringify(h)); } catch (e) { console.warn('History save failed:', e); } }
 
 /* ── Date helpers ───────────────────────────────────────────────── */
 
@@ -387,7 +393,8 @@ function init() {
   initMenu();
 
   settings = loadSettings();
-  history  = loadHistory();
+  history  = pruneHistory(loadHistory());
+  saveHistory(history);
 
   if (!settings || !settings.setupComplete) {
     showSetup();
