@@ -397,6 +397,75 @@ body {
 
 .checklist-item.checked .item-qty { color: var(--checked-text); }
 
+/* ── Progress graph modal ────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-card {
+  background: white;
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 420px;
+  padding: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.22);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: var(--bg);
+  color: var(--text-sec);
+}
+
+.graph-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-left: 8px;
+}
+
+.legend-dot:first-child { margin-left: 0; }
+
+.graph-stats {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
 /* Completion banner */
 .completion-banner {
   margin: 14px 12px 0;

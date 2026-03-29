@@ -12,7 +12,7 @@ const CHECKLIST = [
   { id: 'sauerkraut',  label: 'Sauerkraut',                    qty: '¼ cup',                             cat: 'Vegetables & Greens'  },
   { id: 'tomatopaste', label: 'Tomato Paste',                   qty: '3 Tbsp',                            cat: 'Vegetables & Greens'  },
   { id: 'cacao',       label: 'Raw Cacao',                     qty: '1 oz (nibs, powder, etc.)',         cat: 'Proteins & Fats'      },
-  { id: 'sardines',    label: 'Sardines',                      qty: '4 oz',                              cat: 'Proteins & Fats', weekly: true },
+  { id: 'sardines',    label: 'Sardines',                      qty: '4 oz',                              cat: 'Proteins & Fats'      },
   { id: 'oliveoil',    label: 'Extra Virgin Olive Oil',        qty: '3 Tbsp',                            cat: 'Proteins & Fats'      },
   { id: 'yogurt',      label: 'Yogurt or Kefir',               qty: '6 oz',                              cat: 'Proteins & Fats'      },
   { id: 'hotpepper',   label: 'Hot Pepper or Capsaicin',       qty: '1 hot pepper or equivalent',        cat: 'Spices & Heat'        },
@@ -25,7 +25,7 @@ const DAY_LABELS = { 0: 'Su', 1: 'Mo', 2: 'Tu', 3: 'We', 4: 'Th', 5: 'Fr', 6: 'S
 
 /* ── State ──────────────────────────────────────────────────────── */
 
-let settings = null; // { sardineDays: [int, int], setupComplete: bool, longestStreak: int }
+let settings = null; // { longestStreak: int }
 let history  = {};   // { 'YYYY-MM-DD': { itemId: bool, … } }
 
 /* ── Storage ────────────────────────────────────────────────────── */
@@ -67,14 +67,13 @@ function dowOf(dStr) {
 
 /* ── Checklist logic ────────────────────────────────────────────── */
 
-function applicableItems(dStr) {
-  const dow = dowOf(dStr);
-  return CHECKLIST.filter(item => !item.weekly || settings.sardineDays.includes(dow));
+function applicableItems() {
+  return CHECKLIST;
 }
 
 function isDayComplete(dStr) {
   const checks = history[dStr] ?? {};
-  return applicableItems(dStr).every(item => checks[item.id] === true);
+  return applicableItems().every(item => checks[item.id] === true);
 }
 
 function calcStreak() {
@@ -110,7 +109,7 @@ function render() {
 
 function renderHeader() {
   const today = todayStr();
-  const items  = applicableItems(today);
+  const items  = applicableItems();
   const checks = history[today] ?? {};
   const done   = items.filter(i => checks[i.id]).length;
   const total  = items.length;
@@ -173,19 +172,15 @@ function renderWeekStrip() {
 
   strip.appendChild(row);
 
-  // Sardine progress note for this week
-  const sardineDaysThisWeek = WEEK_ORDER
-    .map((dow, idx) => ({ dow, dStr: offsetDate(monday, idx) }))
-    .filter(({ dow }) => settings.sardineDays.includes(dow));
-
-  const sardineHit = sardineDaysThisWeek.filter(({ dStr }) => {
-    const checks = history[dStr] ?? {};
-    return checks['sardines'] === true;
-  }).length;
+  // Sardine count this week
+  const sardineHit = WEEK_ORDER
+    .map((_, idx) => offsetDate(monday, idx))
+    .filter(dStr => (history[dStr] ?? {})['sardines'] === true)
+    .length;
 
   const note = document.createElement('div');
   note.className = 'sardine-note';
-  note.textContent = `🐟 Sardines  ${sardineHit} / 2 this week`;
+  note.textContent = `🐟 Sardines  ${sardineHit} this week`;
   strip.appendChild(note);
 }
 
@@ -194,7 +189,7 @@ function renderChecklist() {
   container.innerHTML = '';
 
   const today  = todayStr();
-  const items  = applicableItems(today);
+  const items  = applicableItems();
   const checks = history[today] ?? {};
   const allDone = items.length > 0 && items.every(i => checks[i.id]);
 
@@ -276,70 +271,68 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
-/* ── Setup screen ───────────────────────────────────────────────── */
+/* ── Progress graph ─────────────────────────────────────────────── */
 
-function showSetup(prefillDays = null) {
-  document.getElementById('setup').classList.remove('hidden');
-  document.getElementById('main').classList.add('hidden');
+function showGraph() {
+  const today = todayStr();
+  const DAYS  = 30;
+  const data  = [];
 
-  const selectedDays = new Set(prefillDays ?? []);
+  for (let i = DAYS - 1; i >= 0; i--) {
+    const d      = offsetDate(today, -i);
+    const checks = history[d] ?? {};
+    const done   = CHECKLIST.filter(it => checks[it.id]).length;
+    data.push({ d, pct: CHECKLIST.length ? (done / CHECKLIST.length) * 100 : 0 });
+  }
 
-  // Rebuild day-grid buttons to clear any previous listeners
-  const dayGrid = document.getElementById('day-grid');
-  dayGrid.innerHTML = `
-    <button class="day-btn" data-day="1">Mon</button>
-    <button class="day-btn" data-day="2">Tue</button>
-    <button class="day-btn" data-day="3">Wed</button>
-    <button class="day-btn" data-day="4">Thu</button>
-    <button class="day-btn" data-day="5">Fri</button>
-    <button class="day-btn" data-day="6">Sat</button>
-    <button class="day-btn" data-day="0">Sun</button>
-  `;
+  const avgPct      = Math.round(data.reduce((s, d) => s + d.pct, 0) / data.length);
+  const completeDays = data.filter(d => d.pct === 100).length;
 
-  // Replace setup button to clear old listeners
-  const oldBtn = document.getElementById('setup-btn');
-  const newBtn = oldBtn.cloneNode(true);
-  oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+  // SVG chart
+  const vbW = 300, vbH = 140;
+  const padL = 24, padR = 6, padT = 8, padB = 18;
+  const chartW = vbW - padL - padR;
+  const chartH = vbH - padT - padB;
+  const slotW  = chartW / DAYS;
+  const barW   = Math.max(1, slotW - 1.5);
 
-  function syncBtn() { newBtn.disabled = selectedDays.size !== 2; }
+  let svg = '';
 
-  // Pre-select days
-  selectedDays.forEach(d => {
-    const b = dayGrid.querySelector(`[data-day="${d}"]`);
-    if (b) b.classList.add('selected');
-  });
-  syncBtn();
-
-  dayGrid.querySelectorAll('.day-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const day = parseInt(btn.dataset.day);
-      if (selectedDays.has(day)) {
-        selectedDays.delete(day);
-        btn.classList.remove('selected');
-      } else if (selectedDays.size < 2) {
-        selectedDays.add(day);
-        btn.classList.add('selected');
-      }
-      syncBtn();
-    });
+  // Gridlines + Y labels
+  [0, 50, 100].forEach(pct => {
+    const y = padT + chartH - (pct / 100) * chartH;
+    svg += `<line x1="${padL}" y1="${y}" x2="${vbW - padR}" y2="${y}" stroke="#e0ede5" stroke-width="0.5"/>`;
+    svg += `<text x="${padL - 3}" y="${y + 3}" text-anchor="end" font-size="6.5" fill="#95b8a0">${pct}%</text>`;
   });
 
-  newBtn.addEventListener('click', () => {
-    if (!settings) {
-      settings = { sardineDays: [], setupComplete: true, longestStreak: 0 };
-    }
-    settings.sardineDays  = [...selectedDays];
-    settings.setupComplete = true;
-    saveSettings(settings);
-    history = loadHistory();
-    showMain();
+  // Bars
+  data.forEach((day, i) => {
+    const x    = padL + i * slotW;
+    const h    = Math.max(1, (day.pct / 100) * chartH);
+    const y    = padT + chartH - h;
+    const fill = day.pct === 100 ? '#52b788' : day.pct >= 50 ? '#95d5b2' : day.pct > 0 ? '#f5c6c2' : '#eeeeee';
+    svg += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="1" fill="${fill}"/>`;
   });
+
+  // X-axis week labels
+  for (let i = 6; i < DAYS; i += 7) {
+    const cx    = padL + i * slotW + barW / 2;
+    const label = data[i].d.slice(5); // MM-DD
+    svg += `<text x="${cx}" y="${vbH - 2}" text-anchor="middle" font-size="6" fill="#95b8a0">${label}</text>`;
+  }
+
+  document.getElementById('graph-chart').innerHTML =
+    `<svg viewBox="0 0 ${vbW} ${vbH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">${svg}</svg>`;
+
+  document.getElementById('graph-stats').textContent =
+    `${avgPct}% avg · ${completeDays} / ${DAYS} complete days`;
+
+  document.getElementById('graph-modal').classList.remove('hidden');
 }
 
 /* ── Main screen ────────────────────────────────────────────────── */
 
 function showMain() {
-  document.getElementById('setup').classList.add('hidden');
   document.getElementById('main').classList.remove('hidden');
   render();
 }
@@ -372,9 +365,19 @@ function initMenu() {
     exportData();
   });
 
-  document.getElementById('change-days-btn').addEventListener('click', () => {
+  document.getElementById('graph-btn').addEventListener('click', () => {
     closeMenu();
-    showSetup(settings.sardineDays);
+    showGraph();
+  });
+
+  document.getElementById('graph-close').addEventListener('click', () => {
+    document.getElementById('graph-modal').classList.add('hidden');
+  });
+
+  document.getElementById('graph-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('graph-modal')) {
+      document.getElementById('graph-modal').classList.add('hidden');
+    }
   });
 }
 
@@ -392,15 +395,11 @@ function init() {
   registerSW();
   initMenu();
 
-  settings = loadSettings();
+  settings = loadSettings() ?? { longestStreak: 0 };
   history  = pruneHistory(loadHistory());
   saveHistory(history);
 
-  if (!settings || !settings.setupComplete) {
-    showSetup();
-  } else {
-    showMain();
-  }
+  showMain();
 }
 
 document.addEventListener('DOMContentLoaded', init);

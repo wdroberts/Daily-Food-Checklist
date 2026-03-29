@@ -1,7 +1,7 @@
 # Product Requirements Document: Daily Nutrient & Food Checklist App
 
-**Version:** 1.0
-**Date:** 2026-03-21
+**Version:** 1.1
+**Date:** 2026-03-29
 **Status:** Draft
 
 ---
@@ -62,7 +62,7 @@ The app must display the following checklist items each day, grouped by category
 | Item | Target |
 |---|---|
 | Raw Cacao | 1 oz (nibs, powder, etc.) |
-| Sardines | 4 oz — appears only on user's 2 chosen days per week |
+| Sardines | 4 oz |
 | Extra Virgin Olive Oil | 3 Tbsp |
 | Yogurt or Kefir | 6 oz |
 
@@ -76,11 +76,10 @@ The app must display the following checklist items each day, grouped by category
 |---|---|
 | Omega Supplement | 1,000 mg |
 
-### 3.2 Conditional Frequency Items
+### 3.2 Sardine Tracking
 
-- Users must be able to designate 2 days per week for sardines (e.g., Monday & Thursday).
-- On non-sardine days, the sardines item must be hidden or visually marked as "not today."
-- The app must prompt the user to configure their sardine days during onboarding.
+- Sardines appear on the checklist every day.
+- The weekly strip shows a running count of how many days sardines were consumed this week (no fixed weekly goal).
 
 ### 3.3 Check-off Behavior
 
@@ -90,12 +89,11 @@ The app must display the following checklist items each day, grouped by category
 
 ### 3.4 Daily Progress Indicator
 
-- A progress bar or count (e.g., "9 / 13 completed") must be shown at the top of the checklist.
-- The count must reflect only items applicable to the current day (excluding non-sardine days when applicable).
+- A progress bar and count (e.g., "9 / 14 completed") must be shown at the top of the checklist.
 
 ### 3.5 Streak Tracking
 
-- Track consecutive calendar days on which all applicable items are checked before midnight.
+- Track consecutive calendar days on which all items are checked before midnight.
 - Display current streak and longest streak. Longest streak is never reduced.
 - A missed day shows as a gap on the calendar strip; the current streak resets to zero but longest streak is preserved.
 - The week starts on Monday.
@@ -103,10 +101,17 @@ The app must display the following checklist items each day, grouped by category
 ### 3.6 Weekly Overview
 
 - Display a 7-day calendar strip (Mon–Sun) showing complete, incomplete, and missed days distinctly.
-- Show weekly sardine completion (e.g., "1 / 2 sardine days hit this week").
+- Show weekly sardine count (e.g., "🐟 Sardines 3 this week").
 - Week resets on Monday.
 
-### 3.7 Reminders / Notifications (Optional, Phase 2)
+### 3.7 Progress Graph
+
+- A "View progress" option in the overflow menu opens a modal with a 30-day bar chart.
+- Each bar represents one day; height reflects completion percentage (0–100%).
+- Color coding: dark green = 100%, light green = 50–99%, pink = <50%, gray = nothing checked.
+- Summary line shows average completion % and number of fully complete days out of 30.
+
+### 3.8 Reminders / Notifications (Optional, Phase 2)
 
 - Allow users to set optional time-based reminders for specific items or categories (e.g., "Matcha reminder at 8 AM and 12 PM," "Pomegranate evening reminder at 6 PM").
 - Notifications must be opt-in.
@@ -127,12 +132,10 @@ The app must display the following checklist items each day, grouped by category
 
 ## 5. User Flows
 
-### 5.1 First-Time Onboarding
+### 5.1 First-Time Use
 
 1. User opens app for the first time.
-2. App displays a brief welcome screen explaining the checklist purpose.
-3. App prompts user to select their 2 sardine days from a day-of-week picker.
-4. User is taken directly to today's checklist.
+2. Today's checklist is shown immediately — no onboarding required.
 
 ### 5.2 Daily Use (Returning User)
 
@@ -179,12 +182,14 @@ Personal use — formal retention metrics are not applicable. The primary indica
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Daily reset | Calendar day midnight | Simplest; aligns with sardine day-of-week logic |
+| Daily reset | Calendar day midnight | Simplest; aligns with day-of-week streak logic |
 | Accidental tap | Always reversible toggle | A checkbox that can't be unticked is a trap |
 | Missed day behavior | Gap on calendar strip; current streak resets, longest streak preserved | Resetting longest streak is punitive and kills motivation |
-| Week start | Monday | Aligns with standard fitness convention and Mon/Thu sardine example |
+| Week start | Monday | Aligns with standard fitness convention |
 | Data export | Included in v1.0 | One button, JSON export; trivial to build, protects years of history |
 | Sardine list | Fixed; not swappable | Personal protocol is fixed; scope creep otherwise |
+| Sardines daily | Always shown; no day restriction | Simpler UX; removes onboarding; weekly count in strip still shows cadence |
+| Progress graph | 30-day bar chart in overflow menu | Enough history to see trends without overcomplicating the main screen |
 
 ---
 
@@ -198,4 +203,5 @@ Personal use — formal retention metrics are not applicable. The primary indica
 | M4 | Weekly calendar overview |
 | M5 | PWA manifest, service worker, and Add to Home Screen support |
 | M6 | JSON data export |
-| M7 | Optional notification system |
+| M7 | 30-day progress graph |
+| M8 | Optional notification system |
